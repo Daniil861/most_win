@@ -5,7 +5,7 @@
 	<title>Most Win - game</title>
 	<meta charset="UTF-8">
 	<meta name="format-detection" content="telephone=no">
-	<link rel="stylesheet" href="css/style.min.css?_v=20220406181548">
+	<link rel="stylesheet" href="css/style.min.css?_v=20220406234347">
 	<link rel="shortcut icon" href="favicon.ico">
 	<!-- <meta name="robots" content="noindex, nofollow"> -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -33,7 +33,16 @@
 		</div>
 	</div>
 	<div class="wrapper">
+		<div class="wrapper__icon-pause icon-pause _hold">
+			<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<rect x="0.5" y="0.5" width="25" height="25" rx="4.5" stroke="white" />
+				<rect x="7" y="6" width="4" height="14" rx="1" fill="white" />
+				<rect x="15" y="6" width="4" height="14" rx="1" fill="white" />
+			</svg>
+
+		</div>
 		<div class="wrapper__play play">
+			<div class="play__text">0</div>
 			<div class="play__body">
 				<a href="game.html" class="play__button button ">
 					<p>Play again</p>
@@ -43,17 +52,31 @@
 				</a>
 			</div>
 		</div>
+		<div class="wrapper__pause pause">
+			<div class="pause__body">
+				<div class="pause__item pause__item_continue">
+					<p>continue</p>
+				</div>
+				<a href="game.html" class="pause__item pause__item_new-game">
+					<p>new game</p>
+				</a>
+				<a href="index.html" class="pause__item pause__item_menu">
+					<p>home</p>
+				</a>
+			</div>
+		</div>
 		<div class="wrapper__game game">
 			<div class="game__body">
 				<div class="game__box-field box-field">
-					<div class="box-field__levels">
-						<div data-level="1" class="box-field__level">x1.0</div>
-						<div data-level="2" class="box-field__level">x2.0</div>
-						<div data-level="3" class="box-field__level">x3.0</div>
-						<div data-level="4" class="box-field__level">x4.0</div>
-						<div data-level="5" class="box-field__level">x5.0</div>
+					<div class="box-field__field">
+						<div class="box-field__levels">
+							<div data-level="1" class="box-field__level">x1.0</div>
+							<div data-level="2" class="box-field__level">x2.0</div>
+							<div data-level="3" class="box-field__level">x3.0</div>
+							<div data-level="4" class="box-field__level">x4.0</div>
+							<div data-level="5" class="box-field__level">x5.0</div>
+						</div>
 					</div>
-					<div class="box-field__field"></div>
 				</div>
 				<div class="game__actions">
 					<div class="game__choices">
@@ -68,7 +91,7 @@
 						</div>
 						<div class="game__money">
 							<div class="game__bank">
-								<div class="game__text check">720000</div>
+								<div class="game__text check">0</div>
 								<div class="game__icon">
 									<picture><source srcset="img/icons/cent.webp" type="image/webp"><img src="img/icons/cent.png" alt="Icon"></picture>
 								</div>
@@ -86,7 +109,7 @@
 					</button>
 					<div class="game__controls">
 						<div class="game__current-win">
-							<p> Win <span class="game__current-count">320000</span>!</p>
+							<p> Win <span class="game__current-count">0</span>!</p>
 						</div>
 						<div class="game__buttons _hold">
 							<div class="game__arrow game__arrow_top">
@@ -107,7 +130,7 @@
 			</div>
 		</div>
 	</div>
-	<script src="js/app.min.js?_v=20220406181548"></script>
+	<script src="js/app.min.js?_v=20220406234347"></script>
 </body>
 
 </html>
