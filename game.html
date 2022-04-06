@@ -5,11 +5,10 @@
 	<title>Most Win - game</title>
 	<meta charset="UTF-8">
 	<meta name="format-detection" content="telephone=no">
-	<!-- <style>body{opacity: 0;}</style> -->
-	<link rel="stylesheet" href="css/style.min.css?_v=20220405204937">
+	<link rel="stylesheet" href="css/style.min.css?_v=20220406181548">
 	<link rel="shortcut icon" href="favicon.ico">
 	<!-- <meta name="robots" content="noindex, nofollow"> -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 </head>
 
 <body>
@@ -34,6 +33,16 @@
 		</div>
 	</div>
 	<div class="wrapper">
+		<div class="wrapper__play play">
+			<div class="play__body">
+				<a href="game.html" class="play__button button ">
+					<p>Play again</p>
+				</a>
+				<a href="index.html" class="play__button button">
+					<p>Home</p>
+				</a>
+			</div>
+		</div>
 		<div class="wrapper__game game">
 			<div class="game__body">
 				<div class="game__box-field box-field">
@@ -49,7 +58,7 @@
 				<div class="game__actions">
 					<div class="game__choices">
 						<div class="game__levels">
-							<div data-level="1" class="game__level">1</div>
+							<div data-level="1" class="game__level _active">1</div>
 							<div data-level="2" class="game__level">2</div>
 							<div data-level="3" class="game__level">3</div>
 							<div data-level="4" class="game__level">4</div>
@@ -79,7 +88,7 @@
 						<div class="game__current-win">
 							<p> Win <span class="game__current-count">320000</span>!</p>
 						</div>
-						<div class="game__buttons">
+						<div class="game__buttons _hold">
 							<div class="game__arrow game__arrow_top">
 								<picture><source srcset="img/icons/arrow-left.webp" type="image/webp"><img src="img/icons/arrow-left.png" alt="Icon"></picture>
 							</div>
@@ -98,7 +107,7 @@
 			</div>
 		</div>
 	</div>
-	<script src="js/app.min.js?_v=20220405204937"></script>
+	<script src="js/app.min.js?_v=20220406181548"></script>
 </body>
 
 </html>
