@@ -34,12 +34,15 @@
     if (sessionStorage.getItem("money")) {
         if (document.querySelector(".game")) document.querySelector(".check").textContent = sessionStorage.getItem("money");
     } else {
-        sessionStorage.setItem("money", 500);
-        document.querySelector(".check").textContent = 500;
+        sessionStorage.setItem("money", 0);
+        document.querySelector(".check").textContent = 0;
     }
     const preloader = document.querySelector(".preloader");
     const wrapper = document.querySelector(".wrapper");
+    const pause_button = document.querySelector(".icon-pause");
+    const pause_item = document.querySelector(".pause");
     let level_bet = document.querySelector(".game__text_bet");
+    let current_win_block = document.querySelector(".game__current-count");
     let move_timer;
     document.addEventListener("click", (e => {
         let targetElement = e.target;
@@ -51,10 +54,26 @@
         if (targetElement.closest(".game__button")) {
             check_level_game();
             draw_stones();
-            move_stone_random();
+            move_stone_random(100, 500);
+            get_current_floor();
             document.querySelector(".game__levels").classList.add("_hold");
             document.querySelector(".game__buttons").classList.remove("_hold");
             document.querySelector(".game__button").classList.add("_hold");
+            pause_button.classList.remove("_hold");
+        }
+        if (targetElement.closest(".icon-pause")) if (pause_button.classList.contains("_active")) {
+            pause_button.classList.remove("_active");
+            pause_item.classList.remove("_active");
+            move_stone_random(10, 50);
+        } else {
+            pause_button.classList.add("_active");
+            pause_item.classList.add("_active");
+            stones.forEach((el => clearInterval(el.timerId)));
+        }
+        if (targetElement.closest(".pause__item_continue")) {
+            pause_button.classList.remove("_active");
+            pause_item.classList.remove("_active");
+            move_stone_random(10, 50);
         }
     }));
     document.addEventListener("touchstart", (e => {
@@ -110,7 +129,7 @@
     const grid = document.querySelector(".box-field__field");
     const width = 20;
     let layout;
-    layout = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 1, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 1, 1, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 1, 1, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 1, 1, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 ];
+    layout = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 1, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2, 1, 1, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 1, 1, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 1, 1, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1 ];
     const squares = [];
     function create_board() {
         for (let i = 0; i < layout.length; i++) {
@@ -198,15 +217,15 @@
     }
     let stones;
     function draw_stones() {
-        if (1 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, 300) ]; else if (2 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, 250), new Stone(111, 0, 300) ]; else if (3 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, 250), new Stone(111, 0, 300), new Stone(148, 0, 400) ]; else if (4 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, 450), new Stone(111, 0, 400), new Stone(148, 0, 300), new Stone(182, 0, 400) ]; else if (5 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, 500), new Stone(111, 0, 350), new Stone(148, 0, 300), new Stone(182, 0, 350), new Stone(75, 0, 400) ]; else if (6 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, 500), new Stone(111, 0, 400), new Stone(148, 0, 300), new Stone(182, 0, 350), new Stone(75, 0, 400), new Stone(105, 0, 400) ]; else if (7 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, 300), new Stone(111, 0, 450), new Stone(148, 0, 400), new Stone(182, 0, 350), new Stone(75, 0, 350), new Stone(105, 0, 350), new Stone(145, 0, 250) ];
+        if (1 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, random_num(250, 400)) ]; else if (2 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, random_num(250, 400)), new Stone(111, 0, random_num(250, 400)) ]; else if (3 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, random_num(250, 400)), new Stone(111, 0, random_num(250, 400)), new Stone(148, 0, random_num(250, 400)) ]; else if (4 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, random_num(250, 400)), new Stone(111, 0, random_num(250, 400)), new Stone(148, 0, random_num(250, 400)), new Stone(182, 0, random_num(250, 400)) ]; else if (5 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, random_num(250, 500)), new Stone(111, 0, random_num(250, 500)), new Stone(148, 0, random_num(250, 500)), new Stone(182, 0, random_num(250, 500)), new Stone(75, 0, random_num(250, 500)) ]; else if (6 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, random_num(250, 500)), new Stone(111, 0, random_num(250, 500)), new Stone(148, 0, random_num(250, 500)), new Stone(182, 0, random_num(250, 500)), new Stone(75, 0, random_num(250, 500)), new Stone(105, 0, random_num(250, 500)) ]; else if (7 == sessionStorage.getItem("level")) stones = [ new Stone(67, 0, random_num(250, 500)), new Stone(111, 0, random_num(250, 500)), new Stone(148, 0, random_num(250, 500)), new Stone(182, 0, random_num(250, 500)), new Stone(75, 0, random_num(250, 500)), new Stone(105, 0, random_num(250, 500)), new Stone(145, 0, random_num(250, 500)) ];
         stones.forEach((el => {
             squares[el.currentIndex].classList.add("stone");
         }));
     }
-    function move_stone_random() {
+    function move_stone_random(min, max) {
         setTimeout((() => {
             stones.forEach((el => move_stone(el)));
-        }), random_num(2500, 4e3));
+        }), random_num(min, max));
     }
     function move_stone(stone) {
         const directions = [ -1, +1 ];
@@ -238,27 +257,54 @@
             stones.forEach((el => clearInterval(el.timerId)));
             clearInterval(move_timer);
             document.querySelector(".game__buttons").classList.add("_hold");
-            document.querySelector(".play").classList.add("_active");
-            if (squares[heroCurrentIndex].classList.contains("one-floor")) sessionStorage.setItem("floor", 1); else if (squares[heroCurrentIndex].classList.contains("two-floor")) sessionStorage.setItem("floor", 2); else if (squares[heroCurrentIndex].classList.contains("three-floor")) sessionStorage.setItem("floor", 3); else if (squares[heroCurrentIndex].classList.contains("four-floor")) sessionStorage.setItem("floor", 4); else if (squares[heroCurrentIndex].classList.contains("five-floor")) sessionStorage.setItem("floor", 5);
             check_level_and_floor();
+            document.querySelector(".play").classList.add("_active");
         }
+    }
+    let floorId;
+    function get_current_floor() {
+        sessionStorage.getItem("floor");
+        let bet = write_memory_current_bet();
+        floorId = setInterval((() => {
+            if (squares[heroCurrentIndex].classList.contains("one-floor")) sessionStorage.setItem("floor", 1); else if (squares[heroCurrentIndex].classList.contains("two-floor")) sessionStorage.setItem("floor", 2); else if (squares[heroCurrentIndex].classList.contains("three-floor")) sessionStorage.setItem("floor", 3); else if (squares[heroCurrentIndex].classList.contains("four-floor")) sessionStorage.setItem("floor", 4); else if (squares[heroCurrentIndex].classList.contains("five-floor")) sessionStorage.setItem("floor", 5);
+            sessionStorage.setItem("current-win", +sessionStorage.getItem("floor") * bet);
+            current_win_block.textContent = sessionStorage.getItem("current-win");
+        }), 500);
     }
     function check_level_and_floor() {
         let floor = sessionStorage.getItem("floor");
-        let level = sessionStorage.getItem("level");
         let current_bank = +sessionStorage.getItem("money");
+        let bet = write_memory_current_bet();
+        sessionStorage.setItem("money", current_bank + floor * bet);
+        sessionStorage.setItem("current-win", floor * bet);
+        document.querySelector(".play__text").textContent = sessionStorage.getItem("current-win");
+        add_money_in_bank();
+    }
+    function write_memory_current_bet() {
+        let level = sessionStorage.getItem("level");
         let bet = 0;
         if (1 == level) bet = 50; else if (2 == level) bet = 100; else if (3 == level) bet = 150; else if (4 == level) bet = 200; else if (5 == level) bet = 250; else if (6 == level) bet = 300; else if (7 == level) bet = 350;
-        sessionStorage.setItem("money", current_bank + floor * bet);
+        return bet;
     }
     function random_num(min, max) {
         return Math.floor(Math.random() * (max - min) + min);
     }
+    function add_money_in_bank() {
+        setTimeout((() => {
+            document.querySelector(".check").textContent = sessionStorage.getItem("money");
+            document.querySelector(".check").classList.add("_anim");
+            setTimeout((() => {
+                document.querySelector(".check").classList.remove("_anim");
+            }), 1e3);
+        }), 500);
+    }
     function check_win() {
         if (24 == heroCurrentIndex) {
+            sessionStorage.setItem("floor", 5);
             document.querySelector(".game__buttons").classList.add("_hold");
             document.querySelector(".play").classList.add("_active");
             check_level_and_floor();
+            add_money_in_bank();
         }
     }
     window["FLS"] = true;
