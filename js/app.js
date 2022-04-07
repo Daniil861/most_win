@@ -35,7 +35,7 @@
         if (document.querySelector(".game")) document.querySelector(".check").textContent = sessionStorage.getItem("money");
     } else {
         sessionStorage.setItem("money", 0);
-        document.querySelector(".check").textContent = 0;
+        if (document.querySelector(".game")) document.querySelector(".check").textContent = 0;
     }
     const preloader = document.querySelector(".preloader");
     const wrapper = document.querySelector(".wrapper");
