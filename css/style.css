@@ -500,9 +500,18 @@ body._loaded {
   background: #0073e7;
   border-radius: 4px;
   transition: all 0.3s ease 0s;
+  position: relative;
 }
 .game__arrow img {
   width: 30px;
+}
+.game__arrow span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
 }
 .game__arrow:active {
   transform: scale(0.95);
@@ -523,6 +532,22 @@ body._loaded {
 }
 .game__arrow_right img {
   transform: rotate(180deg);
+}
+.game__btn_top {
+  background: url("../img/icons/arrow-left.png") center/contain no-repeat;
+  transform: rotate(90deg) scale(0.8);
+}
+.game__btn_bottom {
+  background: url("../img/icons/arrow-left.png") center/contain no-repeat;
+  transform: rotate(-90deg) scale(0.8);
+}
+.game__btn_left {
+  background: url("../img/icons/arrow-left.png") center/contain no-repeat;
+  transform: scale(0.8);
+}
+.game__btn_right {
+  background: url("../img/icons/arrow-left.png") center/contain no-repeat;
+  transform: rotate(180deg) scale(0.8);
 }
 
 .check._anim {
@@ -548,6 +573,18 @@ body._loaded {
 @supports not (left: clamp( -6.25rem , 11.4285714286rem  +  -31.4285714286vw , 0.625rem )) {
   .box-field__levels {
     left: calc(0.625rem + -6.875 * (100vw - 34.375rem) / 21.875);
+  }
+}
+@media (min-width: 50em) {
+  @supports (left: clamp( -3.125rem , 10.7291666667rem  +  -23.3333333333vw , -0.9375rem )) {
+    .box-field__levels {
+      left: clamp( -3.125rem , 10.7291666667rem  +  -23.3333333333vw , -0.9375rem );
+    }
+  }
+  @supports not (left: clamp( -3.125rem , 10.7291666667rem  +  -23.3333333333vw , -0.9375rem )) {
+    .box-field__levels {
+      left: calc(-0.9375rem + -2.1875 * (100vw - 50rem) / 9.375);
+    }
   }
 }
 @media (max-width: 37.5em) {
@@ -605,6 +642,13 @@ body._loaded {
     height: 13.75rem;
   }
 }
+@media (min-width: 50em) {
+  .box-field__field {
+    width: 47.5rem;
+    height: 15.8125rem;
+    top: 0;
+  }
+}
 .box-field__field div {
   width: 1.5625rem;
   height: 1.125rem;
@@ -613,6 +657,12 @@ body._loaded {
   .box-field__field div {
     width: 1.875rem;
     height: 1.25rem;
+  }
+}
+@media (min-width: 50em) {
+  .box-field__field div {
+    width: 2.375rem;
+    height: 1.4375rem;
   }
 }
 
