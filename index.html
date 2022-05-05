@@ -5,7 +5,7 @@
 	<title>Most Win</title>
 	<meta charset="UTF-8">
 	<meta name="format-detection" content="telephone=no">
-	<link rel="stylesheet" href="css/style.min.css?_v=20220407104207">
+	<link rel="stylesheet" href="css/style.min.css?_v=20220505184644">
 	<link rel="shortcut icon" href="favicon.ico">
 	<!-- <meta name="robots" content="noindex, nofollow"> -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -35,21 +35,77 @@
 	<div class="wrapper">
 		<div class="wrapper__main main">
 			<div class="main__body">
-				<div class="main__hero">
-					<div class="main__stairs">
-						<picture><source srcset="img/main/main-stairs.webp" type="image/webp"><img src="img/main/main-stairs.png" alt="Image"></picture>
+				<div class="main__item main__item_buttons">
+					<div class="main__game main__game_1">
+						<div class="main__hero">
+							<div class="main__stairs">
+								<picture><source srcset="img/main/main-stairs.webp" type="image/webp"><img src="img/main/main-stairs.png" alt="Image"></picture>
+							</div>
+							<div class="main__man">
+								<picture><source srcset="img/icons/hero-1.webp" type="image/webp"><img src="img/icons/hero-1.png" alt="Image"></picture>
+							</div>
+						</div>
+						<a href="game.html" class="main__button button">
+							<span></span>
+							<span>play</span>
+							<span></span>
+						</a>
 					</div>
-					<div class="main__man">
-						<picture><source srcset="img/icons/hero.webp" type="image/webp"><img src="img/icons/hero.png" alt="Image"></picture>
+					<div class="main__game main__game_2">
+						<div class="main__hero main__hero_2">
+							<div class="main__bomb">
+								<picture><source srcset="img/icons/bomb-l.webp" type="image/webp"><img src="img/icons/bomb-l.png" alt="Image"></picture>
+							</div>
+						</div>
+						<a href="game-2.html" class="main__button button">
+							<span></span>
+							<span>play</span>
+							<span></span>
+						</a>
 					</div>
 				</div>
-				<a href="game.html" class="main__button button">
-					<p>play</p>
-				</a>
+				<div class="main__item characters">
+					<div class="characters__body">
+						<h2 class="characters__title">Characters</h2>
+						<div class="characters__current-hero"></div>
+						<div class="characters__items">
+							<div class="characters__item">
+								<div class="characters__image characters__image_1">
+									<picture><source srcset="img/icons/hero-1.webp" type="image/webp"><img src="img/icons/hero-1.png" alt="Image"></picture>
+								</div>
+								<div class="characters__button characters__button_1 button button_yellow">
+									<span></span>
+									<span>Choose</span>
+									<span></span>
+								</div>
+							</div>
+							<div class="characters__item">
+								<div class="characters__image characters__image_2">
+									<picture><source srcset="img/icons/hero-2.webp" type="image/webp"><img src="img/icons/hero-2.png" alt="Image"></picture>
+								</div>
+								<div class="characters__button characters__button_2 button button_gray">
+									<span></span>
+									<span>Win in the wheel</span>
+									<span></span>
+								</div>
+							</div>
+							<div class="characters__item">
+								<div class="characters__image characters__image_3">
+									<picture><source srcset="img/icons/hero-3.webp" type="image/webp"><img src="img/icons/hero-3.png" alt="Image"></picture>
+								</div>
+								<div class="characters__button characters__button_3 button button_gray">
+									<span></span>
+									<span>Win in the wheel</span>
+									<span></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	<script src="js/app.min.js?_v=20220407104207"></script>
+	<script src="js/app.min.js?_v=20220505184644"></script>
 </body>
 
 </html>

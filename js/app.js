@@ -32,10 +32,10 @@
         document.querySelector(".wrapper").classList.add("_visible");
     }
     if (sessionStorage.getItem("money")) {
-        if (document.querySelector(".game")) document.querySelector(".check").textContent = sessionStorage.getItem("money");
+        if (document.querySelector(".game") || document.querySelector(".game-2")) document.querySelector(".check").textContent = sessionStorage.getItem("money");
     } else {
-        sessionStorage.setItem("money", 0);
-        if (document.querySelector(".game")) document.querySelector(".check").textContent = 0;
+        sessionStorage.setItem("money", 5e3);
+        if (document.querySelector(".game") || document.querySelector(".game-2")) document.querySelector(".check").textContent = sessionStorage.getItem("money");
     }
     const preloader = document.querySelector(".preloader");
     const wrapper = document.querySelector(".wrapper");
@@ -44,64 +44,138 @@
     let level_bet = document.querySelector(".game__text_bet");
     let current_win_block = document.querySelector(".game__current-count");
     let move_timer;
-    document.addEventListener("click", (e => {
-        let targetElement = e.target;
-        if (targetElement.closest(".acces-preloader__button")) {
-            sessionStorage.setItem("preloader", true);
-            preloader.classList.add("_hide");
-            wrapper.classList.add("_visible");
+    if (document.querySelector(".main")) {
+        if (!sessionStorage.getItem("current-hero")) sessionStorage.setItem("current-hero", 1);
+        check_hero_color_button(+sessionStorage.getItem("current-hero"));
+        create_hero(+sessionStorage.getItem("current-hero"));
+    }
+    if (document.querySelector(".main") && sessionStorage.getItem("hero-2")) check_hero_color_button(2);
+    if (document.querySelector(".main") && sessionStorage.getItem("hero-3")) check_hero_color_button(3);
+    function create_hero(number_hero) {
+        if (document.querySelector(".characters__current-hero img")) document.querySelector(".characters__current-hero img").remove();
+        let hero = document.createElement("img");
+        hero.setAttribute("src", `img/icons/hero-${number_hero}.png`);
+        hero.setAttribute("alt", `Image`);
+        document.querySelector(".characters__current-hero").append(hero);
+    }
+    function change_color_button(block) {
+        if (block && block.classList.contains("button_yellow")) {
+            block.classList.remove("button_yellow");
+            document.querySelectorAll(".characters__button").forEach((el => {
+                if (el.classList.contains("button_green")) {
+                    el.classList.remove("button_green");
+                    el.classList.add("button_yellow");
+                }
+            }));
+            block.classList.add("button_green");
         }
-        if (targetElement.closest(".game__button")) {
-            check_level_game();
-            draw_stones();
-            move_stone_random(100, 500);
-            get_current_floor();
-            document.querySelector(".game__levels").classList.add("_hold");
-            document.querySelector(".game__buttons").classList.remove("_hold");
-            document.querySelector(".game__button").classList.add("_hold");
-            pause_button.classList.remove("_hold");
+    }
+    function check_hero_color_button(number) {
+        document.querySelector(`.characters__button_${number}`).classList.remove("button_gray");
+        if (+sessionStorage.getItem("current-hero") == number) document.querySelector(`.characters__button_${number}`).classList.add("button_green"); else document.querySelector(`.characters__button_${number}`).classList.add("button_yellow");
+        document.querySelectorAll(`.characters__button_${number} span`).forEach(((el, i) => {
+            if (1 == i) el.textContent = "Choose";
+        }));
+    }
+    const window_width = document.documentElement.clientWidth;
+    const window_height = document.documentElement.clientHeight;
+    let heroStart = [ 300, 5 ];
+    let currentPosition = heroStart;
+    const hero_speed = 5;
+    const hero_width = 100;
+    if (document.querySelector(".game-2")) {
+        create_hero_game_2();
+        sessionStorage.setItem("timer", 1);
+    }
+    const config = {
+        start_coord_x: 0,
+        start_coord_y: 0
+    };
+    function create_hero_game_2() {
+        let number = +sessionStorage.getItem("current-hero");
+        let hero = document.createElement("img");
+        hero.setAttribute("src", `img/icons/hero-${number}.png`);
+        hero.setAttribute("alt", `Image`);
+        document.querySelector(".footer__hero").append(hero);
+    }
+    function move_hero_game_2() {
+        document.querySelector(".footer__hero").style.left = `${currentPosition[0]}px`;
+    }
+    function rotate_hero_left() {
+        document.querySelector(".footer__hero").style.transform = "rotateY(-30deg)";
+    }
+    function rotate_hero_right() {
+        document.querySelector(".footer__hero").style.transform = "rotateY(30deg)";
+    }
+    function clear_rotate_hero() {
+        document.querySelector(".footer__hero").style.transform = "rotateY(0deg)";
+    }
+    function move_timer_game_2() {
+        let minute = document.querySelector(".time-header__minute");
+        let second = document.querySelector(".time-header__sec");
+        if (+second.innerHTML > 59) {
+            let sec = +second.innerHTML;
+            let min = +minute.innerHTML + 1;
+            let num = sec - 59;
+            if (num < 10) num = `0${num}`;
+            minute.textContent = min;
+            second.textContent = num;
         }
-        if (targetElement.closest(".icon-pause")) if (pause_button.classList.contains("_active")) {
-            pause_button.classList.remove("_active");
-            pause_item.classList.remove("_active");
-            move_stone_random(10, 50);
-        } else {
-            pause_button.classList.add("_active");
-            pause_item.classList.add("_active");
-            stones.forEach((el => clearInterval(el.timerId)));
-        }
-        if (targetElement.closest(".pause__item_continue")) {
-            pause_button.classList.remove("_active");
-            pause_item.classList.remove("_active");
-            move_stone_random(10, 50);
-        }
-    }));
-    document.addEventListener("touchstart", (e => {
-        let targetElement = e.target;
-        if (targetElement.closest(".game__arrow_left")) {
-            clearInterval(move_timer);
-            move_hero_left();
-        }
-        if (targetElement.closest(".game__arrow_top")) {
-            clearInterval(move_timer);
-            move_hero_up();
-        }
-        if (targetElement.closest(".game__arrow_right")) {
-            clearInterval(move_timer);
-            move_hero_right();
-        }
-        if (targetElement.closest(".game__arrow_bottom")) {
-            clearInterval(move_timer);
-            move_hero_down();
-        }
-    }));
-    document.addEventListener("touchend", (e => {
-        let targetElement = e.target;
-        if (targetElement.closest(".game__arrow_left")) clearInterval(move_timer);
-        if (targetElement.closest(".game__arrow_top")) clearInterval(move_timer);
-        if (targetElement.closest(".game__arrow_right")) clearInterval(move_timer);
-        if (targetElement.closest(".game__arrow_bottom")) clearInterval(move_timer);
-    }));
+        let timerId = false;
+        timerId = setInterval((() => {
+            let current_sec = 0;
+            if ("00" == second.innerHTML) current_sec = 59; else current_sec = +second.innerHTML - 1;
+            if (current_sec < 10) current_sec = `0${current_sec}`;
+            if (0 == current_sec) current_sec = "00";
+            if (current_sec < 0) current_sec = 59;
+            second.textContent = current_sec;
+            if (59 == current_sec && +minute.innerHTML > 0) minute.textContent = +minute.innerHTML - 1; else if ("00" == current_sec && 0 == +minute.innerHTML) {
+                clearInterval(timerId);
+                sessionStorage.setItem("timer", 0);
+                setTimeout((() => {
+                    document.querySelector(".timer").classList.add("_active");
+                }), 500);
+            }
+        }), 1e3);
+    }
+    function create_bonus() {
+        let images_arr = [ "bomb", "bottle", "box", "cent", "lighting" ];
+        let rand_num = random_num(0, 5);
+        let bonus_speed = random_num(30, 100);
+        console.log(`bonus_speed - ${bonus_speed}`);
+        let num_height = +window_width - 10;
+        let start_position = random_num(5, num_height);
+        let bonus = document.createElement("div");
+        bonus.classList.add("field__bonus");
+        let image = document.createElement("img");
+        image.setAttribute("src", `img/icons/${images_arr[rand_num]}.png`);
+        image.setAttribute("alt", `Image`);
+        bonus.append(image);
+        bonus.style.left = `${start_position}px`;
+        document.querySelector(".field__body").append(bonus);
+        let timerId = false;
+        let top_position = -50;
+        timerId = setInterval((() => {
+            top_position += 5;
+            bonus.style.top = `${top_position}px`;
+            console.log(top_position);
+            if (top_position > window_height + 40) {
+                clearInterval(timerId);
+                bonus.remove();
+            }
+        }), bonus_speed);
+    }
+    function generate_bonuses() {
+        let timerId = false;
+        timerId = setInterval((() => {
+            create_bonus();
+            if (0 == +sessionStorage.getItem("timer")) clearInterval(timerId);
+        }), 1e3);
+    }
+    function start_game_2() {
+        move_timer_game_2();
+        generate_bonuses();
+    }
     function add_class(class_name, block) {
         document.querySelectorAll(block).forEach((el => {
             el.addEventListener("click", (() => {
@@ -307,6 +381,116 @@
             add_money_in_bank();
         }
     }
+    document.addEventListener("click", (e => {
+        let targetElement = e.target;
+        if (targetElement.closest(".acces-preloader__button")) {
+            sessionStorage.setItem("preloader", true);
+            preloader.classList.add("_hide");
+            wrapper.classList.add("_visible");
+        }
+        if (targetElement.closest(".game__button")) {
+            check_level_game();
+            draw_stones();
+            move_stone_random(100, 500);
+            get_current_floor();
+            document.querySelector(".game__levels").classList.add("_hold");
+            document.querySelector(".game__buttons").classList.remove("_hold");
+            document.querySelector(".game__button").classList.add("_hold");
+            pause_button.classList.remove("_hold");
+        }
+        if (targetElement.closest(".icon-pause")) if (pause_button.classList.contains("_active")) {
+            pause_button.classList.remove("_active");
+            pause_item.classList.remove("_active");
+            move_stone_random(10, 50);
+        } else {
+            pause_button.classList.add("_active");
+            pause_item.classList.add("_active");
+            stones.forEach((el => clearInterval(el.timerId)));
+        }
+        if (targetElement.closest(".pause__item_continue")) {
+            pause_button.classList.remove("_active");
+            pause_item.classList.remove("_active");
+            move_stone_random(10, 50);
+        }
+        if (targetElement.closest(".characters__button_1")) {
+            sessionStorage.setItem("current-hero", 1);
+            create_hero(1);
+            change_color_button(targetElement.closest(".characters__button_1"));
+        }
+        if (targetElement.closest(".characters__button_2") && sessionStorage.getItem("hero-2")) {
+            sessionStorage.setItem("current-hero", 2);
+            create_hero(2);
+            change_color_button(targetElement.closest(".characters__button_2"));
+        }
+        if (targetElement.closest(".characters__button_3") && sessionStorage.getItem("hero-3")) {
+            sessionStorage.setItem("current-hero", 3);
+            create_hero(3);
+            change_color_button(targetElement.closest(".characters__button_3"));
+        }
+        if (targetElement.closest(".timer__button_play")) {
+            document.querySelector(".timer").classList.remove("_active");
+            document.querySelector(".time-header__minute").textContent = 1;
+            document.querySelector(".time-header__sec").textContent = 30;
+            sessionStorage.setItem("timer", 1);
+            move_timer_game_2();
+        }
+        if (targetElement.closest(".game-2__button-start")) {
+            document.querySelector(".game-2__box-button-start").classList.add("_active");
+            start_game_2();
+        }
+    }));
+    document.addEventListener("touchstart", (e => {
+        let targetElement = e.target;
+        if (targetElement.closest(".game__arrow_left")) {
+            clearInterval(move_timer);
+            move_hero_left();
+        }
+        if (targetElement.closest(".game__arrow_top")) {
+            clearInterval(move_timer);
+            move_hero_up();
+        }
+        if (targetElement.closest(".game__arrow_right")) {
+            clearInterval(move_timer);
+            move_hero_right();
+        }
+        if (targetElement.closest(".game__arrow_bottom")) {
+            clearInterval(move_timer);
+            move_hero_down();
+        }
+        if (targetElement.closest(".footer__hero")) {
+            config.hero_coord_x = e.touches[0].clientX;
+            config.hero_coord_y = e.touches[0].clientY;
+        }
+    }));
+    document.addEventListener("touchend", (e => {
+        let targetElement = e.target;
+        if (targetElement.closest(".game__arrow_left")) clearInterval(move_timer);
+        if (targetElement.closest(".game__arrow_top")) clearInterval(move_timer);
+        if (targetElement.closest(".game__arrow_right")) clearInterval(move_timer);
+        if (targetElement.closest(".game__arrow_bottom")) clearInterval(move_timer);
+        if (targetElement.closest(".footer__hero")) clear_rotate_hero();
+    }));
+    document.addEventListener("touchmove", (e => {
+        let targetElement = e.target;
+        if (targetElement.closest(".footer__hero")) {
+            let hero_cord_x2 = e.touches[0].clientX;
+            let xDiff = hero_cord_x2 - config.hero_coord_x;
+            console.log(`window_width - ${window_width}`);
+            console.log(`hero_width - ${hero_width} `);
+            console.log(`currentPosition[0] - ${currentPosition[0]}`);
+            if (xDiff > 0) {
+                if (currentPosition[0] < window_width - hero_width) {
+                    currentPosition[0] += hero_speed;
+                    move_hero_game_2();
+                    rotate_hero_right();
+                }
+            } else if (currentPosition[0] > hero_speed) {
+                currentPosition[0] -= hero_speed;
+                move_hero_game_2();
+                rotate_hero_left();
+            }
+        }
+    }));
     window["FLS"] = true;
     isWebp();
 })();
