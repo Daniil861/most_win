@@ -94,14 +94,16 @@
         sessionStorage.setItem("current-time-dificult", 1);
         sessionStorage.setItem("lifes", 4);
     }
+    const config_size = {
+        window_width: document.documentElement.clientWidth,
+        window_height: document.documentElement.clientHeight
+    };
     const config = {
         start_coord_x: 0,
         start_coord_y: 0,
-        currentPosition: [ 300, 5 ],
+        currentPosition: [ config_size.window_width / 2, config_size.window_height - 50 ],
         hero_speed: 5,
         hero_width: 100,
-        window_width: document.documentElement.clientWidth,
-        window_height: document.documentElement.clientHeight,
         timerCl: false,
         timerId: false,
         timerIdBonus: false
@@ -111,7 +113,17 @@
         game_prize: "",
         count_win: 0
     };
-    if (1 == +sessionStorage.getItem("current-hero")) config.hero_speed = 3; else if (2 == +sessionStorage.getItem("current-hero")) config.hero_speed = 5; else if (3 == +sessionStorage.getItem("current-hero")) config.hero_speed = 7;
+    if (1 == +sessionStorage.getItem("current-hero")) {
+        config.hero_speed = 3;
+        config.hero_width = 75;
+    } else if (2 == +sessionStorage.getItem("current-hero")) {
+        config.hero_speed = 5;
+        config.hero_width = 100;
+    } else if (3 == +sessionStorage.getItem("current-hero")) {
+        config.hero_speed = 7;
+        config.hero_width = 90;
+    }
+    if (document.querySelector(".footer__hero")) document.querySelector(".footer__hero").style.maxWidth = `${config.hero_width}px`;
     function create_hero_game_2() {
         let number = +sessionStorage.getItem("current-hero");
         let hero = document.createElement("img");
@@ -189,7 +201,7 @@
             bonus_speed = random_num(15, 40);
             rand_num = random_num(0, 10);
         }
-        let num_height = +config.window_width - 50;
+        let num_height = +config_size.window_width - 50;
         let start_position = random_num(20, num_height);
         let bonus = document.createElement("div");
         bonus.classList.add("field__bonus");
@@ -206,7 +218,7 @@
         timerId = setInterval((() => {
             top_position += 5;
             bonus.style.top = `${top_position}px`;
-            if (top_position > config.window_height + 40) {
+            if (top_position > config_size.window_height + 40) {
                 clearInterval(timerId);
                 bonus.remove();
             }
@@ -237,14 +249,14 @@
             let style = window.getComputedStyle(el);
             let coord_left = parseInt(style.left, 10);
             let coord_top = parseInt(style.top, 10);
-            if (pos_x + 100 > coord_left && pos_y < coord_top + 150 && pos_x < coord_left + 40 && pos_y < coord_top + 150 && !el.classList.contains("_anim")) {
+            if (pos_x + config.hero_width > coord_left && pos_y < coord_top + 170 && pos_x < coord_left + 40 && pos_y < coord_top + 170 && !el.classList.contains("_anim")) {
                 check_bonus_value(el);
                 check_lifes();
                 el.classList.add("_anim");
                 setTimeout((() => {
                     el.remove();
                 }), 500);
-            } else if (coord_top >= config.window_height - 120) el.remove();
+            } else if (coord_top >= config_size.window_height - 120) el.remove();
         }));
     }
     function check_bonus_value(block) {
@@ -711,7 +723,7 @@
             let hero_cord_x2 = e.touches[0].clientX;
             let xDiff = hero_cord_x2 - config.hero_coord_x;
             if (xDiff > 0) {
-                if (config.currentPosition[0] < config.window_width - config.hero_width) {
+                if (config.currentPosition[0] < config_size.window_width - config.hero_width) {
                     config.currentPosition[0] += config.hero_speed;
                     move_hero_game_2();
                     rotate_hero_right();
