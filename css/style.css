@@ -100,6 +100,15 @@ h6 {
   font-size: inherit;
 }
 
+html._hold-100vh {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  height: var(--app-height);
+}
+
 body {
   touch-action: pan-x pan-y;
   opacity: 0;
@@ -113,6 +122,14 @@ body {
 body._loaded {
   opacity: 1;
   visibility: visible;
+}
+body._hold-100vh {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  height: var(--app-height);
 }
 
 .wrapper {
@@ -144,6 +161,19 @@ body._loaded {
 
 [class*=-ibg_contain] img {
   object-fit: contain;
+}
+
+:root {
+  --app-height: 100%;
+}
+
+._hold-100vh {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  height: var(--app-height);
 }
 
 .button {
@@ -505,8 +535,6 @@ body._loaded {
 }
 .characters__image {
   flex: 1 1 auto;
-  position: relative;
-  top: 1.25rem;
 }
 .characters__image_1 img {
   max-width: 5.375rem;
@@ -1022,7 +1050,7 @@ body._loaded {
 }
 
 .game-2__body {
-  min-height: 100vh;
+  min-height: calc(100vh - 70px);
   background: url("../img/game/bg-game.png") center/cover no-repeat;
   display: flex;
   flex-direction: column;
@@ -1055,6 +1083,13 @@ body._loaded {
 .game-2__field {
   flex: 1 1 auto;
 }
+.game-2__foot {
+  background: #2f022a;
+  height: 4.375rem;
+  position: relative;
+  z-index: 15;
+}
+
 .header-game-2 {
   position: relative;
   z-index: 6;
@@ -1196,7 +1231,7 @@ body._loaded {
 
 .timer {
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 30%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -1264,7 +1299,7 @@ body._loaded {
 
 .game-over {
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 30%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -1352,7 +1387,7 @@ body._loaded {
 
 .bonus-box {
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 30%;
   transform: translate(-50%, -50%);
   width: 100%;

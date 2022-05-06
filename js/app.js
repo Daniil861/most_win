@@ -22,6 +22,16 @@
             }));
         }
     }), 0);
+    if (document.querySelector(".game-2")) {
+        const appHeight = () => {
+            const doc = document.documentElement;
+            doc.style.setProperty("--app-height", `${window.innerHeight}px`);
+        };
+        window.addEventListener("resize", appHeight);
+        appHeight();
+        document.documentElement.classList.add("_hold-100vh");
+        document.querySelector("body").classList.add("_hold-100vh");
+    }
     window.addEventListener("load", (function() {
         if (document.querySelector("body")) setTimeout((function() {
             document.querySelector("body").classList.add("_loaded");
@@ -655,7 +665,7 @@
             create_hero(1);
             change_color_button(targetElement.closest(".characters__button_1"));
         }
-        if (targetElement.closest(".characters__button_2") && sessionStorage.getItem("hero-2")) {
+        if (targetElement.closest(".characters__button_2")) if (sessionStorage.getItem("hero-2")) {
             sessionStorage.setItem("current-hero", 2);
             create_hero(2);
             change_color_button(targetElement.closest(".characters__button_2"));
