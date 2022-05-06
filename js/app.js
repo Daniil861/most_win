@@ -164,6 +164,7 @@
             if (59 == current_sec && +minute.innerHTML > 0) minute.textContent = +minute.innerHTML - 1; else if ("00" == current_sec && 0 == +minute.innerHTML) {
                 clearInterval(config.timerId);
                 sessionStorage.setItem("timer", 0);
+                clear_intervals();
                 create_hero_timer();
                 setTimeout((() => {
                     document.querySelector(".timer").classList.add("_active");
@@ -225,10 +226,17 @@
         }), bonus_speed);
     }
     function generate_bonuses() {
-        config.timerIdBonus = setInterval((() => {
-            create_bonus();
-            if (0 == +sessionStorage.getItem("timer")) clearInterval(config.timerIdBonus);
-        }), 700);
+        let speed = 600;
+        let interval = false;
+        interval = setInterval((() => {
+            if (1 == +sessionStorage.getItem("current-time-dificult")) speed = 600; else if (2 == +sessionStorage.getItem("current-time-dificult")) speed = 500; else if (3 == +sessionStorage.getItem("current-time-dificult")) speed = 400;
+        }), 100);
+        setTimeout((() => {
+            config.timerIdBonus = setInterval((() => {
+                create_bonus();
+                if (0 == +sessionStorage.getItem("timer")) clearInterval(config.timerIdBonus);
+            }), speed);
+        }), 200);
     }
     function clear_intervals() {
         clearInterval(config.timerId);
@@ -651,7 +659,7 @@
             document.querySelector(".time-header__sec").textContent = 30;
             sessionStorage.setItem("timer", 1);
             sessionStorage.setItem("current-time-dificult", 1);
-            move_timer_game_2();
+            start_game_2();
         }
         if (targetElement.closest(".game-2__button-start")) {
             document.querySelector(".game-2__box-button-start").classList.add("_active");
