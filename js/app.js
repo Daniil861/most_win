@@ -269,14 +269,14 @@
             let style = window.getComputedStyle(el);
             let coord_left = parseInt(style.left, 10);
             let coord_top = parseInt(style.top, 10);
-            if (pos_x + config.hero_width > coord_left && pos_y < coord_top + 170 && pos_x < coord_left + 40 && pos_y < coord_top + 170 && !el.classList.contains("_anim")) {
+            if (pos_x + config.hero_width > coord_left && pos_y < coord_top + 140 && pos_x < coord_left + 40 && pos_y < coord_top + 140 && !el.classList.contains("_anim")) {
                 check_bonus_value(el);
                 check_lifes();
                 el.classList.add("_anim");
                 setTimeout((() => {
                     el.remove();
                 }), 500);
-            } else if (coord_top >= config_size.window_height - 120) el.remove();
+            } else if (coord_top >= config_size.window_height - 80) el.remove();
         }));
     }
     function check_bonus_value(block) {
