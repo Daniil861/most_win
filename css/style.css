@@ -535,6 +535,8 @@ body._hold-100vh {
 }
 .characters__image {
   flex: 1 1 auto;
+  position: relative;
+  top: -0.3125rem;
 }
 .characters__image_1 img {
   max-width: 5.375rem;
