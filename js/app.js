@@ -124,10 +124,10 @@
         count_win: 0
     };
     if (1 == +sessionStorage.getItem("current-hero")) {
-        config.hero_speed = 3;
+        config.hero_speed = 5;
         config.hero_width = 75;
     } else if (2 == +sessionStorage.getItem("current-hero")) {
-        config.hero_speed = 5;
+        config.hero_speed = 6;
         config.hero_width = 100;
     } else if (3 == +sessionStorage.getItem("current-hero")) {
         config.hero_speed = 7;
