@@ -52,11 +52,22 @@
     if (document.querySelector(".main") && sessionStorage.getItem("hero-2")) check_hero_color_button(2);
     if (document.querySelector(".main") && sessionStorage.getItem("hero-3")) check_hero_color_button(3);
     function create_hero(number_hero) {
-        if (document.querySelector(".characters__current-hero img")) document.querySelector(".characters__current-hero img").remove();
+        if (document.querySelector(".characters__current-hero img")) {
+            document.querySelector(".characters__current-hero img").style.opacity = "0";
+            setTimeout((() => {
+                document.querySelector(".characters__current-hero img").remove();
+            }), 300);
+        }
         let hero = document.createElement("img");
-        hero.setAttribute("src", `img/icons/hero-${number_hero}.png`);
+        if (document.documentElement.classList.contains("webp")) hero.setAttribute("src", `img/icons/hero-${number_hero}.webp`); else hero.setAttribute("src", `img/icons/hero-${number_hero}.png`);
         hero.setAttribute("alt", `Image`);
-        document.querySelector(".characters__current-hero").append(hero);
+        setTimeout((() => {
+            document.querySelector(".characters__current-hero").append(hero);
+            hero.style.opacity = "0";
+            setTimeout((() => {
+                hero.style.opacity = "1";
+            }), 10);
+        }), 310);
     }
     function change_color_button(block) {
         if (block && block.classList.contains("button_yellow")) {
@@ -77,29 +88,39 @@
             if (1 == i) el.textContent = "Choose";
         }));
     }
-    const window_width = document.documentElement.clientWidth;
-    const window_height = document.documentElement.clientHeight;
-    let heroStart = [ 300, 5 ];
-    let currentPosition = heroStart;
-    const hero_speed = 5;
-    const hero_width = 100;
     if (document.querySelector(".game-2")) {
         create_hero_game_2();
         sessionStorage.setItem("timer", 1);
+        sessionStorage.setItem("current-time-dificult", 1);
+        sessionStorage.setItem("lifes", 4);
     }
     const config = {
         start_coord_x: 0,
-        start_coord_y: 0
+        start_coord_y: 0,
+        currentPosition: [ 300, 5 ],
+        hero_speed: 5,
+        hero_width: 100,
+        window_width: document.documentElement.clientWidth,
+        window_height: document.documentElement.clientHeight,
+        timerCl: false,
+        timerId: false,
+        timerIdBonus: false
     };
+    const config_circle = {
+        last_rotate: 0,
+        game_prize: "",
+        count_win: 0
+    };
+    if (1 == +sessionStorage.getItem("current-hero")) config.hero_speed = 3; else if (2 == +sessionStorage.getItem("current-hero")) config.hero_speed = 5; else if (3 == +sessionStorage.getItem("current-hero")) config.hero_speed = 7;
     function create_hero_game_2() {
         let number = +sessionStorage.getItem("current-hero");
         let hero = document.createElement("img");
-        hero.setAttribute("src", `img/icons/hero-${number}.png`);
+        if (document.documentElement.classList.contains("webp")) hero.setAttribute("src", `img/icons/hero-${number}.webp`); else hero.setAttribute("src", `img/icons/hero-${number}.png`);
         hero.setAttribute("alt", `Image`);
         document.querySelector(".footer__hero").append(hero);
     }
     function move_hero_game_2() {
-        document.querySelector(".footer__hero").style.left = `${currentPosition[0]}px`;
+        document.querySelector(".footer__hero").style.left = `${config.currentPosition[0]}px`;
     }
     function rotate_hero_left() {
         document.querySelector(".footer__hero").style.transform = "rotateY(-30deg)";
@@ -113,16 +134,15 @@
     function move_timer_game_2() {
         let minute = document.querySelector(".time-header__minute");
         let second = document.querySelector(".time-header__sec");
-        if (+second.innerHTML > 59) {
-            let sec = +second.innerHTML;
-            let min = +minute.innerHTML + 1;
-            let num = sec - 59;
-            if (num < 10) num = `0${num}`;
-            minute.textContent = min;
-            second.textContent = num;
-        }
-        let timerId = false;
-        timerId = setInterval((() => {
+        config.timerId = setInterval((() => {
+            if (+second.innerHTML > 59) {
+                let sec = +second.innerHTML;
+                let min = +minute.innerHTML + 1;
+                let num = sec - 59;
+                if (num < 10) num = `0${num}`;
+                minute.textContent = min;
+                second.textContent = num;
+            }
             let current_sec = 0;
             if ("00" == second.innerHTML) current_sec = 59; else current_sec = +second.innerHTML - 1;
             if (current_sec < 10) current_sec = `0${current_sec}`;
@@ -130,51 +150,210 @@
             if (current_sec < 0) current_sec = 59;
             second.textContent = current_sec;
             if (59 == current_sec && +minute.innerHTML > 0) minute.textContent = +minute.innerHTML - 1; else if ("00" == current_sec && 0 == +minute.innerHTML) {
-                clearInterval(timerId);
+                clearInterval(config.timerId);
                 sessionStorage.setItem("timer", 0);
+                create_hero_timer();
                 setTimeout((() => {
                     document.querySelector(".timer").classList.add("_active");
                 }), 500);
             }
+            if (+minute.innerHTML >= 1 && current_sec > 1) sessionStorage.setItem("current-time-dificult", 1); else if (1 == +minute.innerHTML && "00" == current_sec) sessionStorage.setItem("current-time-dificult", 2); else if (0 == +minute.innerHTML && current_sec <= 30) sessionStorage.setItem("current-time-dificult", 3);
         }), 1e3);
     }
+    function check_lifes() {
+        let lifes = +sessionStorage.getItem("lifes");
+        let array = document.querySelectorAll(".header-game-2__hearts img");
+        if (lifes < 4) {
+            for (let i = 0; i < 4; i++) array[i].classList.add("_hide");
+            for (let i = 0; i < lifes; i++) array[i].classList.remove("_hide");
+        } else if (4 == lifes) for (let i = 0; i < 4; i++) array[i].classList.remove("_hide");
+    }
+    function add_bonus_lifes(num) {
+        if (1 == num && +sessionStorage.getItem("lifes") < 4) sessionStorage.setItem("lifes", +sessionStorage.getItem("lifes") + num); else if (2 == num && 3 == +sessionStorage.getItem("lifes")) sessionStorage.setItem("lifes", +sessionStorage.getItem("lifes") + 1); else if (2 == num && (2 == +sessionStorage.getItem("lifes") || 1 == +sessionStorage.getItem("lifes"))) sessionStorage.setItem("lifes", +sessionStorage.getItem("lifes") + 2);
+    }
     function create_bonus() {
-        let images_arr = [ "bomb", "bottle", "box", "cent", "lighting" ];
-        let rand_num = random_num(0, 5);
-        let bonus_speed = random_num(30, 100);
-        console.log(`bonus_speed - ${bonus_speed}`);
-        let num_height = +window_width - 10;
-        let start_position = random_num(5, num_height);
+        let images_arr = [];
+        let bonus_speed = 0;
+        let rand_num = 0;
+        let rand_rotate = random_num(0, 360);
+        if (1 == +sessionStorage.getItem("current-time-dificult")) {
+            images_arr = [ "bomb", "bomb", "bomb", "bottle", "bottle", "box", "cent", "cent", "cent", "lighting" ];
+            bonus_speed = random_num(30, 100);
+            rand_num = random_num(0, 10);
+        } else if (2 == +sessionStorage.getItem("current-time-dificult")) {
+            images_arr = [ "bomb", "bomb", "bomb", "bottle", "box", "cent", "lighting" ];
+            bonus_speed = random_num(30, 50);
+            rand_num = random_num(0, 7);
+        } else if (3 == +sessionStorage.getItem("current-time-dificult")) {
+            images_arr = [ "bomb", "bomb", "bomb", "bomb", "bomb", "bomb", "bottle", "box", "cent", "lighting" ];
+            bonus_speed = random_num(15, 40);
+            rand_num = random_num(0, 10);
+        }
+        let num_height = +config.window_width - 50;
+        let start_position = random_num(20, num_height);
         let bonus = document.createElement("div");
         bonus.classList.add("field__bonus");
+        bonus.dataset.value = images_arr[rand_num];
         let image = document.createElement("img");
         image.setAttribute("src", `img/icons/${images_arr[rand_num]}.png`);
         image.setAttribute("alt", `Image`);
+        image.style.transform = `rotate(${rand_rotate}deg)`;
         bonus.append(image);
         bonus.style.left = `${start_position}px`;
         document.querySelector(".field__body").append(bonus);
         let timerId = false;
-        let top_position = -50;
+        let top_position = -40;
         timerId = setInterval((() => {
             top_position += 5;
             bonus.style.top = `${top_position}px`;
-            console.log(top_position);
-            if (top_position > window_height + 40) {
+            if (top_position > config.window_height + 40) {
                 clearInterval(timerId);
                 bonus.remove();
             }
         }), bonus_speed);
     }
     function generate_bonuses() {
-        let timerId = false;
-        timerId = setInterval((() => {
+        config.timerIdBonus = setInterval((() => {
             create_bonus();
-            if (0 == +sessionStorage.getItem("timer")) clearInterval(timerId);
-        }), 1e3);
+            if (0 == +sessionStorage.getItem("timer")) clearInterval(config.timerIdBonus);
+        }), 700);
+    }
+    function clear_intervals() {
+        clearInterval(config.timerId);
+        clearInterval(config.timerIdBonus);
+        clearInterval(config.timerCl);
     }
     function start_game_2() {
         move_timer_game_2();
         generate_bonuses();
+        config.timerCl = setInterval((() => {
+            check_collision_game_2();
+        }), 100);
+    }
+    function check_collision_game_2() {
+        let pos_x = config.currentPosition[0];
+        let pos_y = config.currentPosition[1];
+        document.querySelectorAll(".field__bonus").forEach((el => {
+            let style = window.getComputedStyle(el);
+            let coord_left = parseInt(style.left, 10);
+            let coord_top = parseInt(style.top, 10);
+            if (pos_x + 100 > coord_left && pos_y < coord_top + 150 && pos_x < coord_left + 40 && pos_y < coord_top + 150 && !el.classList.contains("_anim")) {
+                check_bonus_value(el);
+                check_lifes();
+                el.classList.add("_anim");
+                setTimeout((() => {
+                    el.remove();
+                }), 500);
+            } else if (coord_top >= config.window_height - 120) el.remove();
+        }));
+    }
+    function check_bonus_value(block) {
+        if ("bomb" == block.dataset.value) {
+            document.querySelector(".footer__hero").classList.add("_target");
+            setTimeout((() => {
+                document.querySelector(".footer__hero").classList.remove("_target");
+            }), 1200);
+            if (+sessionStorage.getItem("lifes") <= 1) {
+                clear_intervals();
+                setTimeout((() => {
+                    document.querySelector(".game-over").classList.add("_active");
+                    document.querySelectorAll(".field__bonus").forEach((el => el.style.opacity = "0"));
+                }), 500);
+            }
+            sessionStorage.setItem("lifes", +sessionStorage.getItem("lifes") - 1);
+        } else if ("bottle" == block.dataset.value) {
+            if (+sessionStorage.getItem("lifes") < 4) add_bonus_lifes(1);
+        } else if ("box" == block.dataset.value) {
+            clear_intervals();
+            setTimeout((() => {
+                document.querySelector(".bonus-box").classList.add("_active");
+                document.querySelectorAll(".field__bonus").forEach((el => el.style.opacity = "0"));
+            }), 500);
+        } else if ("cent" == block.dataset.value) add_money(10, ".check", 1e3, 2e3); else if ("lighting" == block.dataset.value) {
+            document.querySelector(".time-header__sec").textContent = +document.querySelector(".time-header__sec").innerHTML + 10;
+            document.querySelector(".time-header__time").classList.add("_anim");
+            setTimeout((() => {
+                document.querySelector(".time-header__time").classList.remove("_anim");
+            }), 1e3);
+        }
+    }
+    function create_hero_timer() {
+        let number = +sessionStorage.getItem("current-hero");
+        let hero = document.createElement("img");
+        if (document.documentElement.classList.contains("webp")) hero.setAttribute("src", `img/icons/hero-${number}.webp`); else hero.setAttribute("src", `img/icons/hero-${number}.png`);
+        hero.setAttribute("alt", `Image`);
+        document.querySelector(".timer__image_hero").append(hero);
+    }
+    function rotate_drum() {
+        config_circle.last_rotate += random_num(100, 2e3);
+        document.querySelector(".circle__image").style.transform = `rotate(${config_circle.last_rotate}deg)`;
+    }
+    function get_target_block() {
+        let arrow_top = document.querySelector(".circle__dot").getBoundingClientRect().top;
+        let arrow_left = document.querySelector(".circle__dot").getBoundingClientRect().left;
+        let dot = document.createElement("div");
+        dot.style.width = `5px`;
+        dot.style.height = `5px`;
+        dot.style.position = `fixed`;
+        dot.style.zIndex = `10`;
+        dot.style.top = `${arrow_top}px`;
+        dot.style.left = `${arrow_left}px`;
+        document.querySelector(".wrapper").append(dot);
+        let arrow_top2 = dot.getBoundingClientRect().top + 6;
+        let arrow_left2 = dot.getBoundingClientRect().left - 6;
+        let target_block2 = document.elementFromPoint(arrow_left2, arrow_top2);
+        setTimeout((() => {
+            dot.remove();
+        }), 1e3);
+        return target_block2;
+    }
+    function check_target_item(block) {
+        let value = block.dataset.circle;
+        create_image_bonus_box(value);
+        if (0 == value) document.querySelector(".prize__text-value").textContent = "zero"; else if ("heart-2" == value) {
+            document.querySelector(".prize__text-value").textContent = "+2 HP";
+            add_bonus_lifes(2);
+            check_lifes();
+        } else if ("prize" == value) document.querySelector(".prize__text-value").textContent = "a new character!"; else if ("money-2" == value) {
+            document.querySelector(".prize__text-value").textContent = "+20 coins";
+            add_money(20, ".check", 500, 1500);
+        } else if ("heart" == value) {
+            document.querySelector(".prize__text-value").textContent = "+1 HP";
+            add_bonus_lifes(1);
+            check_lifes();
+        } else if ("money" == value) {
+            document.querySelector(".prize__text-value").textContent = "+10 coins";
+            add_money(10, ".check", 500, 1500);
+        } else if ("lighting" == value) {
+            document.querySelector(".prize__text-value").textContent = "+10 seconds";
+            document.querySelector(".time-header__sec").textContent = +document.querySelector(".time-header__sec").innerHTML + 10;
+            document.querySelector(".time-header__time").classList.add("_anim");
+            setTimeout((() => {
+                document.querySelector(".time-header__time").classList.remove("_anim");
+            }), 1e3);
+        }
+        document.querySelector(".bonus-box__value").classList.add("_hide");
+        setTimeout((() => {
+            document.querySelector(".prize").classList.remove("_hide");
+        }), 300);
+    }
+    function create_image_bonus_box(value) {
+        let image = document.createElement("img");
+        if (0 == value) image.setAttribute("src", `img/icons/zero.png`); else if ("heart-2" == value || "heart" == value) image.setAttribute("src", `img/icons/heart-big.png`); else if ("prize" == value) {
+            let number = generate_random_character();
+            image.setAttribute("src", `img/icons/hero-${number}.png`);
+        } else if ("money-2" == value || "money" == value) image.setAttribute("src", `img/icons/cent-big.png`); else if ("lighting" == value) image.setAttribute("src", `img/icons/lighting-big.png`);
+        image.setAttribute("alt", `Image`);
+        document.querySelector(".prize__image_2").append(image);
+    }
+    function generate_random_character() {
+        if (!sessionStorage.getItem("hero-2")) {
+            sessionStorage.setItem("hero-2", true);
+            return 2;
+        } else if (!sessionStorage.getItem("hero-3")) {
+            sessionStorage.setItem("hero-3", true);
+            return 3;
+        } else return 1;
     }
     function add_class(class_name, block) {
         document.querySelectorAll(block).forEach((el => {
@@ -187,6 +366,33 @@
                 draw_bet();
             }));
         }));
+    }
+    function delete_money(count, block) {
+        let money = +sessionStorage.getItem("money");
+        sessionStorage.setItem("money", money - count);
+        setTimeout((() => {
+            document.querySelector(block).classList.add("_delete-money");
+            document.querySelector(block).textContent = sessionStorage.getItem("money");
+        }), 500);
+        setTimeout((() => {
+            document.querySelector(block).classList.remove("_delete-money");
+        }), 1500);
+    }
+    function no_money(block) {
+        document.querySelector(block).classList.add("_no-money");
+        setTimeout((() => {
+            document.querySelector(block).classList.remove("_no-money");
+        }), 1e3);
+    }
+    function add_money(count, block, delay, delay_off) {
+        setTimeout((() => {
+            document.querySelector(block).textContent = +sessionStorage.getItem("money") + count;
+            document.querySelector(block).classList.add("_anim");
+            sessionStorage.setItem("money", +sessionStorage.getItem("money") + count);
+        }), delay);
+        setTimeout((() => {
+            document.querySelector(block).classList.remove("_anim");
+        }), delay_off);
     }
     function draw_bet() {
         let num = sessionStorage.getItem("level");
@@ -432,10 +638,38 @@
             document.querySelector(".time-header__minute").textContent = 1;
             document.querySelector(".time-header__sec").textContent = 30;
             sessionStorage.setItem("timer", 1);
+            sessionStorage.setItem("current-time-dificult", 1);
             move_timer_game_2();
         }
         if (targetElement.closest(".game-2__button-start")) {
             document.querySelector(".game-2__box-button-start").classList.add("_active");
+            start_game_2();
+        }
+        if (targetElement.closest(".game-over__button_play")) if (+sessionStorage.getItem("money") >= 700 && document.querySelector(".game-over").classList.contains("_active")) {
+            document.querySelector(".game-over").classList.remove("_active");
+            sessionStorage.setItem("lifes", 1);
+            delete_money(700, ".check");
+            check_lifes();
+            start_game_2();
+        } else no_money(".check");
+        if (targetElement.closest(".circle__image") || targetElement.closest(".circle__values")) {
+            rotate_drum();
+            document.querySelector(".circle__image").classList.add("_hold");
+            setTimeout((() => {
+                document.querySelector(".circle__image").classList.remove("_hold");
+                setTimeout((() => {
+                    let block = get_target_block();
+                    check_target_item(block);
+                }), 100);
+            }), 2e3);
+        }
+        if (targetElement.closest(".prize__button")) {
+            document.querySelector(".bonus-box").classList.remove("_active");
+            setTimeout((() => {
+                document.querySelector(".bonus-box__value").classList.remove("_hide");
+                document.querySelector(".prize").classList.add("_hide");
+                document.querySelector(".prize__image_2 img").remove();
+            }), 1e3);
             start_game_2();
         }
     }));
@@ -460,6 +694,7 @@
         if (targetElement.closest(".footer__hero")) {
             config.hero_coord_x = e.touches[0].clientX;
             config.hero_coord_y = e.touches[0].clientY;
+            config.currentPosition[1] = config.hero_coord_y;
         }
     }));
     document.addEventListener("touchend", (e => {
@@ -475,17 +710,14 @@
         if (targetElement.closest(".footer__hero")) {
             let hero_cord_x2 = e.touches[0].clientX;
             let xDiff = hero_cord_x2 - config.hero_coord_x;
-            console.log(`window_width - ${window_width}`);
-            console.log(`hero_width - ${hero_width} `);
-            console.log(`currentPosition[0] - ${currentPosition[0]}`);
             if (xDiff > 0) {
-                if (currentPosition[0] < window_width - hero_width) {
-                    currentPosition[0] += hero_speed;
+                if (config.currentPosition[0] < config.window_width - config.hero_width) {
+                    config.currentPosition[0] += config.hero_speed;
                     move_hero_game_2();
                     rotate_hero_right();
                 }
-            } else if (currentPosition[0] > hero_speed) {
-                currentPosition[0] -= hero_speed;
+            } else if (config.currentPosition[0] > config.hero_speed) {
+                config.currentPosition[0] -= config.hero_speed;
                 move_hero_game_2();
                 rotate_hero_left();
             }
