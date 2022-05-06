@@ -1120,6 +1120,9 @@ body._loaded {
 .time-header__time._anim {
   animation: jump-money 0.5s ease 2;
 }
+.time-header__time._anim-red {
+  animation: color 0.6s ease infinite;
+}
 .time-header__dotts {
   animation: blink 2s linear infinite;
 }
@@ -1612,5 +1615,10 @@ body._loaded {
 @keyframes blink_hero {
   100% {
     opacity: 0.3;
+  }
+}
+@keyframes color {
+  100% {
+    color: rgb(252, 114, 114);
   }
 }

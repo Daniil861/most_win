@@ -170,7 +170,19 @@
                     document.querySelector(".timer").classList.add("_active");
                 }), 500);
             }
-            if (+minute.innerHTML >= 1 && current_sec > 1) sessionStorage.setItem("current-time-dificult", 1); else if (1 == +minute.innerHTML && "00" == current_sec) sessionStorage.setItem("current-time-dificult", 2); else if (0 == +minute.innerHTML && current_sec <= 30) sessionStorage.setItem("current-time-dificult", 3);
+            if (+minute.innerHTML >= 1 && current_sec > 1) {
+                sessionStorage.setItem("current-time-dificult", 1);
+                if (document.querySelector(".time-header__time").classList.contains("_anim-red")) document.querySelector(".time-header__time").classList.remove("_anim-red");
+            } else if (1 == +minute.innerHTML && "00" == current_sec) {
+                sessionStorage.setItem("current-time-dificult", 2);
+                if (document.querySelector(".time-header__time").classList.contains("_anim-red")) document.querySelector(".time-header__time").classList.remove("_anim-red");
+            } else if (0 == +minute.innerHTML && current_sec > 30) {
+                sessionStorage.setItem("current-time-dificult", 2);
+                if (document.querySelector(".time-header__time").classList.contains("_anim-red")) document.querySelector(".time-header__time").classList.remove("_anim-red");
+            } else if (0 == +minute.innerHTML && current_sec <= 30) {
+                sessionStorage.setItem("current-time-dificult", 3);
+                document.querySelector(".time-header__time").classList.add("_anim-red");
+            }
         }), 1e3);
     }
     function check_lifes() {
